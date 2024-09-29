@@ -1,0 +1,20 @@
+{
+  "name": "high-street-gym",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "backend": "npm run start -w backend",
+    "frontend": "npm run dev -w frontend",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "high_street_gym"
+  },
+  "author": "Arya Suwegatama",
+  "license": "ISC",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}
