@@ -189,8 +189,9 @@ export default function MobileTimetable() {
                           </p>
                         </div>
                       </div>
+                      <hr className="my-4 border" />
                       <button
-                        className="button-main-style mt-4"
+                        className="button-main-style "
                         onClick={() => handleOpenModal(classItem)}
                       >
                         View Details
@@ -232,8 +233,9 @@ export default function MobileTimetable() {
                           </p>
                         </div>
                       </div>
+                      <hr className="my-4 border" />
                       <button
-                        className="button-main-style mt-4"
+                        className="button-main-style "
                         onClick={() => handleOpenModal(classItem)}
                       >
                         View Details
@@ -275,8 +277,9 @@ export default function MobileTimetable() {
                           </p>
                         </div>
                       </div>
+                      <hr className="my-4 border" />
                       <button
-                        className="button-main-style mt-4"
+                        className="button-main-style"
                         onClick={() => handleOpenModal(classItem)}
                       >
                         View Details
@@ -332,12 +335,12 @@ export default function MobileTimetable() {
             {/* -------------- */}
             <div className="modal-action">
               <button
-                className="button-secondary-style"
+                className="button-secondary-style text-sm"
                 onClick={handleCloseModal}
               >
                 Close
               </button>
-              <button className="button-main-style">Book Now</button>
+              <button className="button-main-style text-sm">Book Now</button>
             </div>
           </div>
         </div>

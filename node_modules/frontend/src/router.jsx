@@ -1,12 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import WelcomePage from "./pages/auth";
 import HomePage from "./pages/home";
-import DesktopTimetable from "./components/desktopTimetable";
 import Layout from "./layout";
 import Booking from "./pages/booking";
-import Clubs from "./pages/clubs";
-import MobileTimetable from "./components/mobileTimetable";
 import TimetableContainer from "./pages/timetable";
+import ClubsContainer from "./pages/clubs";
 
 const router = createBrowserRouter([
     {
@@ -23,7 +21,6 @@ const router = createBrowserRouter([
             },
             {
                 path: "timetable",
-                // element: <DesktopTimetable />,
                 element: <TimetableContainer/>,
             },
             {
@@ -32,7 +29,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "clubs",
-                element: <Clubs />,
+                element: <ClubsContainer />,
             },
         ]
     },

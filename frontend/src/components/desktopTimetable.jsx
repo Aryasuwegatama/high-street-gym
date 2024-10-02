@@ -17,7 +17,7 @@ export default function DesktopTimetable() {
   const [activeDate, setActiveDate] = useState(new Date());
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedClub, setSelectedClub] = useState(null);
-  
+
   // Function to get the first day of the week (Monday)
   const getStartOfWeek = (date) => {
     const dayOfWeek = date.getDay() || 7; // Sunday is 0, so we use 7 for Sunday
@@ -92,19 +92,19 @@ export default function DesktopTimetable() {
   return (
     <>
       <div className="flex gap-4 items-center p-4 justify-center">
-      <h3 className="font-semibold">
-        {new Date().toLocaleDateString("en-AU", {
-          weekday: "long",
-        })}
-        ,{" "}
-        {new Date().toLocaleDateString("en-AU", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })}
-      </h3>
-      {/* Club Selection Dropdown */}
-      <div className="dropdown">
+        <h3 className="font-semibold">
+          {new Date().toLocaleDateString("en-AU", {
+            weekday: "long",
+          })}
+          ,{" "}
+          {new Date().toLocaleDateString("en-AU", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </h3>
+        {/* Club Selection Dropdown */}
+        <div className="dropdown">
           <select
             value={selectedClub ? selectedClub.id : ""}
             onChange={(e) => {
@@ -117,10 +117,10 @@ export default function DesktopTimetable() {
             className="select select-bordered w-full max-w-xs"
           >
             <option value="" disabled selected>
-            Choose Club
+              Choose Club
             </option>
             {clubs.map((club) => (
-              <option key={club.id} value={club.id}>
+              <option className="text-sm" key={club.id} value={club.id}>
                 {club.name}
               </option>
             ))}
@@ -137,8 +137,7 @@ export default function DesktopTimetable() {
             disabled={checkThisWeekDates}
           >
             <IoIosArrowBack
-              className={`h-8 w-8 ${checkThisWeekDates ? "text-gray-300" : ""
-                }`}
+              className={`h-8 w-8 ${checkThisWeekDates ? "text-gray-300" : ""}`}
             />
           </button>
 
@@ -173,81 +172,86 @@ export default function DesktopTimetable() {
           </button>
         </div>
 
-
         {/* Class Cards */}
         <div className="grid grid-cols-7 gap-2 mx-auto px-16">
-          {selectedClub && ["Morning", "Afternoon", "Evening"].map((timeOfDay) => (
-            <React.Fragment key={timeOfDay}>
-              <div className="col-span-full bg-gray-200 p-2 text-center font-semibold">
-                {timeOfDay} Class
-              </div>
-              {currentWeekDates.map((day) => {
-                // Format the date to match your classData format
-                const formattedDay = day
-                  .toLocaleDateString("en-AU", {
-                    day: "numeric",
-                    month: "numeric",
-                    year: "numeric",
-                  })
-                  .replace(/\//g, "-");
+          {selectedClub &&
+            ["Morning", "Afternoon", "Evening"].map((timeOfDay) => (
+              <React.Fragment key={timeOfDay}>
+                <div className="col-span-full bg-gray-200 p-2 text-center font-semibold">
+                  {timeOfDay} Class
+                </div>
+                {currentWeekDates.map((day) => {
+                  // Format the date to match your classData format
+                  const formattedDay = day
+                    .toLocaleDateString("en-AU", {
+                      day: "numeric",
+                      month: "numeric",
+                      year: "numeric",
+                    })
+                    .replace(/\//g, "-");
 
-                // Filter classes for the current day and time of the day and the selected club
-                const dayClasses = classData.filter((classItem) => {
-                  const classHour = parseInt(
-                    classItem.time.split(":")[0],
-                    10
-                  );
+                  // Filter classes for the current day and time of the day and the selected club
+                  const dayClasses = classData.filter((classItem) => {
+                    const classHour = parseInt(
+                      classItem.time.split(":")[0],
+                      10
+                    );
+                    return (
+                      classItem.date === formattedDay &&
+                      classItem.location === selectedClub.location &&
+                      ((timeOfDay === "Morning" && classHour < 12) ||
+                        (timeOfDay === "Afternoon" &&
+                          classHour >= 12 &&
+                          classHour < 17) ||
+                        (timeOfDay === "Evening" && classHour >= 17))
+                    );
+                  });
+
+                  // Check if the day is in the past
+                  const isPastDay = day < new Date().setHours(0, 0, 0, 0);
+
                   return (
-                    classItem.date === formattedDay &&
-                     classItem.location === selectedClub.location &&
-                    ((timeOfDay === "Morning" && classHour < 12) ||
-                      (timeOfDay === "Afternoon" &&
-                        classHour >= 12 &&
-                        classHour < 17) ||
-                      (timeOfDay === "Evening" && classHour >= 17))
-                  );
-                });
-
-                // Check if the day is in the past
-                const isPastDay = day < new Date().setHours(0, 0, 0, 0);
-
-                return (
-                  <div key={day.toISOString()} className="flex flex-col gap-4">
-                    {dayClasses.map((classItem) => (
-                      <div
-                        key={classItem.id}
-                        className={`card bg-base-100 shadow-xl p-3 my-2 ${
-                          isPastDay
-                            ? "bg-gray-100 text-gray-400"
-                            : "bg-base-100"
-                        }`}
-                      >
-                        <h3 className="text-xs font-bold">
-                          {classItem.class}
-                        </h3>
-                        <hr className="my-1" />
-                        <p className="text-xs font-semibold">
-                          {classItem.time}
-                        </p>
-                        <p className="text-xs">{classItem.duration} Minutes</p>
-                        <p className="text-xs">{classItem.location}</p>
-                        <hr className="border my-2" />
-                        <button
-                          className="flex text-xs p-0 text-info "
-                          disabled={isPastDay}
-                          onClick={() => handleOpenModal(classItem)}
+                    <div
+                      key={day.toISOString()}
+                      className="flex flex-col gap-4"
+                    >
+                      {dayClasses.map((classItem) => (
+                        <div
+                          key={classItem.id}
+                          className={`card bg-base-100 shadow-xl p-3 my-2 ${
+                            isPastDay
+                              ? "bg-gray-100 text-gray-400"
+                              : "bg-base-100"
+                          }`}
                         >
-                          <PiDotsThreeCircleVertical className="h-4 w-4 mr-2 hidden lg:flex" />
-                          View Details
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
-           {!selectedClub && (
+                          <h3 className="text-xs font-bold">
+                            {classItem.class}
+                          </h3>
+                          <hr className="my-1" />
+                          <p className="text-xs font-semibold">
+                            {classItem.time}
+                          </p>
+                          <p className="text-xs">
+                            {classItem.duration} Minutes
+                          </p>
+                          <p className="text-xs">{classItem.location}</p>
+                          <hr className="border my-2" />
+                          <button
+                            className="flex text-xs p-0 text-info "
+                            disabled={isPastDay}
+                            onClick={() => handleOpenModal(classItem)}
+                          >
+                            <PiDotsThreeCircleVertical className="h-4 w-4 mr-2 hidden lg:flex" />
+                            View Details
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          {!selectedClub && (
             <div className="col-span-full text-center py-4">
               <p>Select a club to view classes.</p>
             </div>
@@ -287,12 +291,12 @@ export default function DesktopTimetable() {
             <hr />
             <div className="modal-action">
               <button
-                className="button-secondary-style"
+                className="button-secondary-style text-sm"
                 onClick={handleCloseModal}
               >
                 Close
               </button>
-              <button className="button-main-style">Book Now</button>
+              <button className="button-main-style text-sm">Book Now</button>
             </div>
           </div>
         </div>

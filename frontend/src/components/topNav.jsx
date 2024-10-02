@@ -8,7 +8,7 @@ export default function TopNav() {
   const { currentPage } = useContext(PageContext);
 
   return (
-    <div className="navbar sticky top-0 bg-neutral md:px-10 z-50">
+    <div className="navbar sticky top-0 bg-neutral md:px-10 z-50 relative">
       <div className="navbar-start">
         <img className="w-12 mx-4 md:w-14 md:mx-4" src={logo} alt="" />
       </div>
