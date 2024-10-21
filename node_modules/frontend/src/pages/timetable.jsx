@@ -1,10 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import DesktopTimetable from "../components/desktopTimetable";
-import MobileTimetable from "../components/mobileTimetable";
+import DesktopTimetable from "../components/timetableComponents/desktopTimetable";
+import MobileTimetable from "../components/timetableComponents/mobileTimetable";
 
 export default function TimetableContainer() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Add an event listener to update isMobile when the window is resized
   useEffect(() => {
@@ -20,9 +20,5 @@ export default function TimetableContainer() {
     };
   }, []);
 
-  return (
-    <div>
-      {isMobile ? <MobileTimetable /> : <DesktopTimetable />}
-    </div>
-  );
+  return <div>{isMobile ? <MobileTimetable /> : <DesktopTimetable />}</div>;
 }

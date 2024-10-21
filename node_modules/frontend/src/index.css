@@ -2,15 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* for testing */
+* {
+  /* border: 1px red dotted; */
+}
+
+
+/* CUSTOM CLASS COMPONENT */
 @layer components {
   .button-main-style {
-   @apply btn btn-primary text-lg hover:bg-secondary px-8 focus:outline focus:bg-secondary rounded-full;
+   @apply btn btn-info text-lg hover:bg-primary px-8 focus:outline focus:bg-primary rounded-full;
   }
   .button-secondary-style {
     @apply btn hover:bg-base-300 px-8 focus:outline focus:bg-base-300 text-lg rounded-full;
   }
+  .button-delete-style {
+    @apply btn btn-error hover:bg-error px-8 focus:outline focus:bg-error text-sm text-base-100 rounded-full;
+  }
 }
 
+/* WEBKIT TEXT INPUT FIELD */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
