@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import MobileClubs from "../components/mobileClub";
-import DesktopClubs from "../components/desktopClub";
+import MobileClubs from "../components/clubsComponents/mobileClub";
+import DesktopClubs from "../components/clubsComponents/desktopClub";
 
 export default function ClubsContainer() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);

@@ -18,7 +18,10 @@ module.exports = {
       },
       extend: {
         backgroundImage: {
-          'welcome-img': "url('/hero-image.png')"
+          'welcome-img': "url('/hero-image.png')",
+          'banner-img': "url('/banner-image.jpg')",
+          'banner-img2': "url('/gym-img.jpg')",
+
         },
       },
     },
@@ -39,11 +42,11 @@ module.exports = {
                     
             "info": "#0084d4",
                     
-            "success": "#9ecb00",
+            "success": "#22c55e",
                     
-            "warning": "#d58100",
+            "warning": "#eab308",
                     
-            "error": "#ff5b6a",
+            "error": "#ef4444",
           },
         },
       ],
