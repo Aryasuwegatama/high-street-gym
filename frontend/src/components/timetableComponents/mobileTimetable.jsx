@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "react-calendar/dist/Calendar.css";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import * as classes from "../../api/classes";
 
@@ -122,19 +121,26 @@ export default function MobileTimetable() {
         return;
       }
 
-      await classes.bookClass(selectedClass.class_id, selectedTrainer);
+      const result = await classes.bookClass(
+        selectedClass.class_id,
+        selectedTrainer
+      );
 
-      alert("Class booked successfully!");
-      handleCloseModal();
-    } catch (error) {
-      // Check for the double-booking error based on the error message
-      if (error.message === "You already booked this class.") {
-        alert("You have already booked this class.");
-      } else if (error.message === "This class is fully booked.") {
-        alert("This class is fully booked. Please choose another class.");
+      if (!result.success) {
+        if (result.message === "You have already booked this class.") {
+          alert("You have already booked this class.");
+        } else if (result.message === "This class with the selected trainer is fully booked.") {
+          alert("This class is fully booked. Please choose another class.");
+        } else {
+          alert(result.message);
+        }
       } else {
-        alert("Failed to book class. Please try again.");
+        alert("Class booked successfully!");
+        handleCloseModal();
       }
+    } catch (error) {
+      console.error("Error booking class:", error);
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -177,7 +183,7 @@ export default function MobileTimetable() {
       </h3>
 
       <div className="container mx-auto p-2 pb-20">
-        <div className="bg-base-200 p-4 rounded-lg mb-4 flex justify-between items-center relative">
+        <div className="bg-base-200 p-4 rounded-lg mb-4 flex justify-between items-center">
           <button
             onClick={handlePrevDate}
             disabled={activeDate.toDateString() === new Date().toDateString()}

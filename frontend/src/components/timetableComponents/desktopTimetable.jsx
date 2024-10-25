@@ -4,6 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { PiDotsThreeCircleVertical } from "react-icons/pi";
 import * as classes from "../../api/classes";
+import Footer from "../Footer";
 
 const clubs = [
   { id: 1, name: "Ashgrove", location: "Ashgrove" },
@@ -343,7 +344,7 @@ export default function DesktopTimetable() {
               </React.Fragment>
             ))}
           {!selectedClub && (
-            <div className="col-span-full text-center py-4">
+            <div className="col-span-full text-center py-4 mb-56">
               <p>Select a club to view classes.</p>
             </div>
           )}
@@ -438,6 +439,7 @@ export default function DesktopTimetable() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
 }

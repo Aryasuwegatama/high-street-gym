@@ -1,1 +1,1 @@
-export const userIdTest = 66
+export const userIdTest = 3

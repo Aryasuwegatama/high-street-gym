@@ -1,0 +1,20 @@
+##
+POST http://localhost:5000/xml-upload/activities
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<activities-upload operation="insert">
+    <activities>
+        <activity>
+            <name>Yoga</name>
+            <capacity>20</capacity>
+            <description>A relaxing yoga session for mindfulness and flexibility.</description>
+        </activity>
+        <activity>
+            <name>Pilates</name>
+            <capacity>15</capacity>
+            <description>Pilates for core strength and posture improvement.</description>
+        </activity>
+    </activities>
+</activities-upload>
+ 

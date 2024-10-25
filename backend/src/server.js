@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import classRouter from "./routes/classes.js"
+import blogRouter from "./routes/blog.js"
+import XMLRouter from "./routes/XMLImport.js";
 
 const port = 5000;
 const app = express();
@@ -14,6 +16,8 @@ app.use(cors({
 
 // import router
 app.use("/classes", classRouter)
+app.use("/blogs", blogRouter)
+app.use("/xml-upload", XMLRouter)
 
 // Catch errors raised by endpoints and respond with JSON error object
 app.use((err, req, res, next) => {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE activities-upload [
+    <!ELEMENT activities-upload (activities)>
+    <!ATTLIST activities-upload operation (insert|update) "insert">
+    <!ELEMENT activities (activity+)>
+    <!ELEMENT activity (id?, name, duration, capacity, description?)>
+    <!ELEMENT id (#PCDATA)>
+    <!ELEMENT name (#PCDATA)>
+    <!ELEMENT duration (#PCDATA)>
+    <!ELEMENT capacity (#PCDATA)>
+    <!ELEMENT description (#PCDATA)>
+]>
+<activities-upload operation="insert">
+    <activities>
+        <activity>
+            <name>Silat</name>
+            <duration>20</duration>
+            <capacity>2</capacity>
+            <description>A relaxing yoga session for mindfulness and flexibility.</description>
+        </activity>
+    </activities>
+</activities-upload>
+
+<!-- <activities-upload operation="update">
+    <activities>
+        <activity>
+            <id>1</id>
+            <name>Yoga</name>
+            <capacity>22</capacity>
+            <description>A calming yoga session with new stretching exercises.</description>
+        </activity>
+    </activities>
+</activities-upload> -->

@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import * as classes from "../api/classes";
 import { userIdTest } from "../user-session-sample";
-import Banner from "../components/banner";
+import Banner from "../components/Banner";
 import BookingTabContent from "../components/bookingComponents/BookingTabContent";
-import BookingDetailsModal from "../components/bookingComponents/BookingDetailsModal";
-import CancelBookingModal from "../components/bookingComponents/ConfirmedBookingCard";
-import RemoveBookingModal from "../components/bookingComponents/CancelledBookingCard";
-import ConfirmedBookingCard from "../components/bookingComponents/ConfirmedBookingCard";
-import CancelledBookingCard from "../components/bookingComponents/CancelledBookingCard";
+import Footer from "../components/Footer";
 
 export default function Booking() {
   const [bookedClasses, setBookedClasses] = useState([]);
@@ -73,9 +69,9 @@ export default function Booking() {
   }, {});
 
   return (
-    <div className="pb-20">
+    <div>
       <Banner />
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 pb-20">
         <h2 className="font-semibold py-10 text-xl">MY BOOKINGS</h2>
         <div role="tablist" className="tabs tabs-lifted tabs-lg">
           <input
@@ -133,6 +129,7 @@ export default function Booking() {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

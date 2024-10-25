@@ -5,6 +5,7 @@ import Layout from "./layout";
 import Booking from "./pages/booking";
 import TimetableContainer from "./pages/timetable";
 import ClubsContainer from "./pages/clubs";
+import Blog from "./components/Blog";
 
 const router = createBrowserRouter([
     {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
                 element: <ClubsContainer />,
             },
         ]
+    },
+    {
+        path: "/blogs",
+        element: <Blog/>
     },
     
 

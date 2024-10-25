@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { HiOutlinePhone, HiOutlineMail } from "react-icons/hi";
+import Footer from "../Footer";
 
 // Create a custom icon
 const clubIcon = new L.Icon({
@@ -19,15 +20,15 @@ export default function DesktopClubs() {
   const [selectedClub, setSelectedClub] = useState(null);
   const mapRef = useRef(null);
 
-  useEffect(() => {
-    // Set mapLoaded to true when the map container is loaded
-    if (mapRef.current) {
-      const map = mapRef.current.leafletElement;
-      map.on("load", () => {
-        setMapLoaded(true);
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Set mapLoaded to true when the map container is loaded
+  //   if (mapRef.current) {
+  //     const map = mapRef.current.leafletElement;
+  //     map.on("load", () => {
+  //       setMapLoaded(true);
+  //     });
+  //   }
+  // }, []);
 
   const openModal = (club) => {
     setSelectedClub(club);
@@ -165,6 +166,7 @@ export default function DesktopClubs() {
           </div>
         )}
       </div>
+        <Footer/>
     </>
   );
 }

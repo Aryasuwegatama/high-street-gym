@@ -65,26 +65,29 @@ export async function getClassesByClub(clubName) {
   
 
   // book a class with the selected trainer
-export async function bookClass(classId, trainerName) {
-  const response = await fetch(`${API_URL}/classes/booking`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ classId, trainerName, userId: userIdTest })
-  });
-
-  if (response.status === 409) {
-    throw new Error("You have already booked this class.");
+  export async function bookClass(classId, trainerName) {
+    const response = await fetch(`${API_URL}/classes/booking`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ classId, trainerName, userId: userIdTest }),
+    });
+  
+    if (response.status === 409) {
+      const errorData = await response.json();
+      return { success: false, message: errorData.message };
+    }
+  
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, message: errorData.message || "Failed to book class." };
+    }
+  
+    const data = await response.json();
+    return { success: true, data };
   }
   
-  if (!response.ok) {
-    throw new Error("Failed to book class.");
-  }
-
-  const data = await response.json();
-  return data;
-}
 
 // API function to get user's booked classes
 export async function getUserBookings(userId) {
