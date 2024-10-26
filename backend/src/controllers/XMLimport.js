@@ -1,97 +1,78 @@
-import * as xmlImportModel from "../models/XMLimport.js"
-import parseStringPromise from "xml2js"
+// controllers/XMLImportController.js
+import * as XMLImportModel from "../models/XMLimport.js";
+import xml2js from "xml2js";
 
-// Helper funtion to parse the xml
-export async function parseXML(xmlData) {
-    try {
-        return await parseStringPromise(xmlData);
-    } catch (error) {
-        console.error("Error parsing XML:", error);
-        throw new Error("Invalid XML format");
-    }
+// Helper function to parse XML
+async function parseXML(xmlData) {
+  try {
+    const parser = new xml2js.Parser();
+    return await parser.parseStringPromise(xmlData);
+  } catch (error) {
+    console.error("Error parsing XML:", error);
+    throw new Error("Invalid XML format");
+  }
 }
 
-// Handle the upload and processing of the XML file
+// Upload and process the XML for activities
 export async function uploadActivities(req, res) {
-    try {
-        // Check if the file is present in the request
-        if (req.files && req.files["xml-file"]) {
-            const XMLFile = req.files["xml-file"]; // Access the uploaded XML file
-            const file_text = XMLFile.data.toString(); // Convert to string
-
-            // Parse the XML into JavaScript object
-            const data = await parseStringPromise(file_text);
-            const activityUpload = data["activities-upload"]; // Root element
-            const operation = activityUpload["$"]["operation"]; // Get operation attribute
-            const activitiesData = activityUpload["activities"][0]["activity"]; // Nested activities
-
-            if (operation === "insert") {
-                // Insert new activities into the database
-                Promise.all(activitiesData.map((activity) => {
-                    const name = activity.name[0];
-                    const duration = parseInt(activity.duration[0]);
-                    const capacity = parseInt(activity.capacity[0]);
-                    const description = activity.description ? activity.description[0] : "";
-
-                    // Insert activity into the database
-                    return insertActivity(name, capacity, description);
-                }))
-                .then(() => {
-                    res.status(200).json({
-                        status: 200,
-                        message: "Activities uploaded successfully!",
-                    });
-                })
-                .catch((error) => {
-                    res.status(500).json({
-                        status: 500,
-                        message: "Failed to upload activities: " + error,
-                    });
-                });
-
-            } else if (operation === "update") {
-                // Update existing activities
-                Promise.all(activitiesData.map((activity) => {
-                    const id = parseInt(activity.id[0]);
-                    const name = activity.name[0];
-                    const duration = parseInt(activity.duration[0]);
-                    const capacity = parseInt(activity.capacity[0]);
-                    const description = activity.description ? activity.description[0] : "";
-
-                    // Update the activity in the database
-                    return updateActivity(id, name, duration, capacity, description);
-                }))
-                .then(() => {
-                    res.status(200).json({
-                        status: 200,
-                        message: "Activities updated successfully!",
-                    });
-                })
-                .catch((error) => {
-                    res.status(500).json({
-                        status: 500,
-                        message: "Failed to update activities: " + error,
-                    });
-                });
-
-            } else {
-                res.status(400).json({
-                    status: 400,
-                    message: "Invalid operation attribute value in XML.",
-                });
-            }
-
-        } else {
-            res.status(400).json({
-                status: 400,
-                message: "No file selected.",
-            });
-        }
-    } catch (error) {
-        console.error("Error parsing XML:", error);
-        res.status(500).json({
-            status: 500,
-            message: "Error processing XML: " + error.message,
-        });
+  // console.log("Request Files:", req.files); 
+  try {
+    if (!req.files || !req.files["xml-file"]) {
+      return res.status(400).json({ message: "No file selected." });
     }
+
+    const XMLFile = req.files["xml-file"];
+    const fileText = XMLFile.data.toString();
+    // console.log("Received File Content:", fileText); 
+
+    const data = await parseXML(fileText);
+    const activityUpload = data["activities-upload"];
+    const operation = activityUpload["$"]["operation"];
+    const activitiesData = activityUpload["activities"][0]["activity"];
+
+    if (operation === "insert") {
+      await Promise.all(
+        activitiesData.map(async (activity) => {
+          const { name, capacity, duration, description, trainers, club_id } = extractActivity(activity);
+          const activityId = await XMLImportModel.insertActivity(name, capacity, duration, description);
+
+          // Add trainers to the activity
+          await Promise.all(
+            trainers.map((trainerId) =>
+              XMLImportModel.addTrainerToActivity(activityId, trainerId, club_id)
+            )
+          );
+        })
+      );
+      return res.status(200).json({ message: "Activities uploaded successfully!" });
+
+    } else if (operation === "update") {
+      await Promise.all(
+        activitiesData.map(async (activity) => {
+          const { id, name, capacity, duration, description } = extractActivity(activity);
+          await XMLImportModel.updateActivity(id, name, capacity, duration, description);
+        })
+      );
+      return res.status(200).json({ message: "Activities updated successfully!" });
+
+    } else {
+      return res.status(400).json({ message: "Invalid operation attribute in XML." });
+    }
+  } catch (error) {
+    console.error("Error processing XML:", error);
+    return res.status(500).json({ message: "Error processing XML: " + error.message });
+  }
+}
+
+// extract activity data from XML structure
+function extractActivity(activity) {
+  return {
+    id: activity.id ? parseInt(activity.id[0], 10) : null,
+    name: activity.name[0],
+    capacity: parseInt(activity.capacity[0], 10),
+    duration: parseInt(activity.duration[0], 10),
+    description: activity.description ? activity.description[0] : "",
+    trainers: activity.trainers ? activity.trainers[0].trainer.map((t) => parseInt(t, 10)) : [],
+    club_id: parseInt(activity.club_id[0], 10),
+  };
 }

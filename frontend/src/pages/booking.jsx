@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import * as classes from "../api/classes";
 import { userIdTest } from "../user-session-sample";
-import Banner from "../components/Banner";
+import Banner from "../components/common/Banner";
 import BookingTabContent from "../components/bookingComponents/BookingTabContent";
-import Footer from "../components/Footer";
+import Footer from "../components/common/Footer";
 
 export default function Booking() {
   const [bookedClasses, setBookedClasses] = useState([]);

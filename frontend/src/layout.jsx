@@ -2,8 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { useLocation, Outlet } from "react-router-dom";
 import PageContext from "./context/PageContext";
-import BtmNav from "./components/bottomNav";
-import TopNav from "./components/topNav";
+import BtmNav from "./components/common/BottomNav";
+import TopNav from "./components/common/topNav";
 
 export default function Layout() {
   const location = useLocation();
@@ -16,8 +16,8 @@ export default function Layout() {
       case "/timetable":
         setCurrentPage("TIMETABLE");
         break;
-      case "/booking":
-        setCurrentPage("BOOKING");
+      case "/bookings":
+        setCurrentPage("BOOKINGS");
         break;
       case "/clubs":
         setCurrentPage("CLUBS");

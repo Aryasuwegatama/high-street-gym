@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { HiOutlinePhone, HiOutlineMail } from "react-icons/hi";
-import Footer from "../Footer";
+import Footer from "../common/Footer";
 
 // Create a custom icon
 const clubIcon = new L.Icon({

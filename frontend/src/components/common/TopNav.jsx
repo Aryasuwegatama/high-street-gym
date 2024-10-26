@@ -2,7 +2,7 @@ import { TbUserCircle } from "react-icons/tb";
 import { Link } from "react-router-dom";
 import logo from "/logo-white.png";
 import { useContext } from "react";
-import PageContext from "../context/PageContext";
+import PageContext from "../../context/PageContext";
 
 export default function TopNav() {
   const { currentPage } = useContext(PageContext);
@@ -32,12 +32,12 @@ export default function TopNav() {
             TIMETABLE
           </Link>
           <Link
-            to="/booking"
+            to="/bookings"
             className={`text-base-100 hover:text-gray-300 ${
-              currentPage === "BOOKING" ? "text-info" : ""
+              currentPage === "BOOKINGS" ? "text-info" : ""
             }`}
           >
-            BOOKING
+            BOOKINGS
           </Link>
           <Link
             to="/clubs"
@@ -70,9 +70,10 @@ export default function TopNav() {
             className="menu menu-md dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-            <span className="xs:hidden">
-            <TbUserCircle className="text-black h-4" />
-            Hi, Arya</span>
+              <span className="xs:hidden">
+                <TbUserCircle className="text-black h-4" />
+                Hi, Arya
+              </span>
             </li>
             <li>
               <a className="justify-between">Profile</a>

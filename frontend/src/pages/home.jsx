@@ -1,7 +1,7 @@
 import React from "react";
-import Footer from "../components/Footer";
+import Footer from "../components/common/Footer";
 import Blog from "../components/Blog";
-import Banner from "../components/Banner";
+import Banner from "../components/common/Banner";
 
 
 export default function HomePage() {

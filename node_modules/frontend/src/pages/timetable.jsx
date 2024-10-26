@@ -1,7 +1,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import DesktopTimetable from "../components/timetableComponents/desktopTimetable";
-import MobileTimetable from "../components/timetableComponents/mobileTimetable";
+// import DesktopTimetable from "../components/timetableComponents/desktopTimetableComponent/desktopTimetable";
+import DesktopTimetable from "../components/timetableComponents/desktopTimetableComponent/DtTimetable";
+// import MobileTimetable from "../components/timetableComponents/mobileTimetableComponents/mobileTimetable";
+import MobileTimetable from "../components/timetableComponents/mobileTimetableComponents/MbTimetable";
 
 export default function TimetableContainer() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);

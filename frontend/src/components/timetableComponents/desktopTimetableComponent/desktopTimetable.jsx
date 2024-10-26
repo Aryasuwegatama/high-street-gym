@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import "react-calendar/dist/Calendar.css";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { PiDotsThreeCircleVertical } from "react-icons/pi";
-import * as classes from "../../api/classes";
-import Footer from "../Footer";
+import * as classes from "../../../api/classes";
+import Footer from "../../common/Footer";
 
 const clubs = [
   { id: 1, name: "Ashgrove", location: "Ashgrove" },

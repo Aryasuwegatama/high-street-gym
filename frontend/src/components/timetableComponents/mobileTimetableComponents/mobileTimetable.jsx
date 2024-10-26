@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import * as classes from "../../api/classes";
+import * as classes from "../../../api/classes";
 
 const clubs = [
   { id: 1, name: "Ashgrove", location: "Ashgrove" },
@@ -89,8 +89,8 @@ export default function MobileTimetable() {
 
   const handleOpenModal = (classItem) => {
     setSelectedClass(classItem);
-    setSelectedTrainer(""); 
-    setTrainerAvailability(null);  
+    setSelectedTrainer("");
+    setTrainerAvailability(null);
   };
 
   const handleCloseModal = () => {
@@ -129,7 +129,10 @@ export default function MobileTimetable() {
       if (!result.success) {
         if (result.message === "You have already booked this class.") {
           alert("You have already booked this class.");
-        } else if (result.message === "This class with the selected trainer is fully booked.") {
+        } else if (
+          result.message ===
+          "This class with the selected trainer is fully booked."
+        ) {
           alert("This class is fully booked. Please choose another class.");
         } else {
           alert(result.message);
@@ -398,7 +401,7 @@ export default function MobileTimetable() {
             <p className="py-2">
               <span className="font-semibold">Availability:</span>{" "}
               {loadingAvailability ? (
-                <span className="loading loading-spinner loading-sm"></span> 
+                <span className="loading loading-spinner loading-sm"></span>
               ) : trainerAvailability !== null ? (
                 `${trainerAvailability}/${selectedClass.activity_capacity}`
               ) : (

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import PageContext from "../context/PageContext";
+import PageContext from "../../context/PageContext";
 import {
   TbFileTypeXml,
   TbHome,
@@ -34,35 +34,38 @@ export default function BtmNav({ setCurrentPage }) {
         onClick={() => setCurrentPage("TIMETABLE")}
         className="h-12 text-base-100 text-xs bg-transparent border-none"
       >
-        <TbCalendarSearch 
-        className={`h-7 text-base-100 ${
-          currentPage === "TIMETABLE" ? "text-info" : ""
-        }`}
-        size="lg" />
+        <TbCalendarSearch
+          className={`h-7 text-base-100 ${
+            currentPage === "TIMETABLE" ? "text-info" : ""
+          }`}
+          size="lg"
+        />
         timetable
       </Link>
       <Link
-        to={"/booking"}
-        onClick={() => setCurrentPage("BOOKING")}
+        to={"/bookings"}
+        onClick={() => setCurrentPage("BOOKINGS")}
         className="h-12 text-base-100 text-xs bg-transparent border-none"
       >
-        <TbBook2 
-        className={`h-7 text-base-100 ${
-          currentPage === "BOOKING" ? "text-info" : ""
-        }`} 
-        size="lg" />
-        booking
+        <TbBook2
+          className={`h-7 text-base-100 ${
+            currentPage === "BOOKINGS" ? "text-info" : ""
+          }`}
+          size="lg"
+        />
+        bookings
       </Link>
       <Link
         to={"/clubs"}
         onClick={() => setCurrentPage("CLUBS")}
         className="h-12 text-base-100 text-xs bg-transparent border-none"
       >
-        <GrMapLocation 
-        className={`h-7 text-base-100 ${
-          currentPage === "CLUBS" ? "text-info" : ""
-        }`} 
-        size="lg" />
+        <GrMapLocation
+          className={`h-7 text-base-100 ${
+            currentPage === "CLUBS" ? "text-info" : ""
+          }`}
+          size="lg"
+        />
         clubs
       </Link>
       {/* <Link
