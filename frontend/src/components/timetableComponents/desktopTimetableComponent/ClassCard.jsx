@@ -1,8 +1,11 @@
 import { PiDotsThreeCircleVertical } from "react-icons/pi";
 
-export default function ClassCard({ day, handleOpenModal, dayClasses, isPastDay }) {
-
-
+export default function ClassCard({
+  day,
+  handleOpenModal,
+  dayClasses,
+  isPastDay,
+}) {
   return (
     <div key={day.toISOString()} className="flex flex-col gap-2">
       {dayClasses.map((classItem) => (

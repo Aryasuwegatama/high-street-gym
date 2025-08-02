@@ -1,22 +1,16 @@
-// DesktopTimetable.jsx
 import React, { useState, useEffect } from "react";
-import Footer from "../../common/Footer";
-import TimetableHeader from "./DesktopTimetableHeader";
+import { useAuth } from "../../../context/AuthContext";
+import TimetableHeader from "./DtTimetableHeader";
 import ClubDropdown from "./ClubDropDown";
 import ClassList from "./ClassList";
 import ClassModal from "./ClassModal";
-import XMLUploader from "../../XML/XMLUploader";
 import * as classes from "../../../api/classes";
-
-const clubs = [
-  { id: 1, name: "Ashgrove", location: "Ashgrove" },
-  { id: 2, name: "Brisbane City", location: "Brisbane" },
-  { id: 3, name: "Chermside", location: "Chermside" },
-  { id: 4, name: "Graceville", location: "Graceville" },
-  { id: 5, name: "Westlake", location: "Westlake" },
-];
+import * as bookings from "../../../api/bookings";
+import * as clubsApi from "../../../api/clubs";
+import { useNavigate } from "react-router-dom";
 
 export default function DesktopTimetable() {
+  const { authenticatedUser, authToken } = useAuth();
   const [activeDate, setActiveDate] = useState(new Date());
   const [selectedClub, setSelectedClub] = useState(null);
   const [classData, setClassData] = useState([]);
@@ -26,17 +20,22 @@ export default function DesktopTimetable() {
   const [selectedTrainer, setSelectedTrainer] = useState("");
   const [trainerAvailability, setTrainerAvailability] = useState(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
-
-  // State for modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [clubs, setClubs] = useState([]);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     const fetchClassData = async () => {
       if (!selectedClub) return;
       setIsLoading(true);
+      setError(null);
       try {
-        const data = await classes.getClassesByClub(selectedClub.name);
+        const data = await classes.getClassesByClub(
+          selectedClub.club_name,
+          authToken
+        ); // Use authToken
         setClassData(data);
       } catch (err) {
         setError(err.message);
@@ -45,7 +44,19 @@ export default function DesktopTimetable() {
       }
     };
     fetchClassData();
-  }, [selectedClub]);
+  }, [selectedClub, authToken]);
+
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const data = await clubsApi.getAllClubs(authToken);
+        setClubs(data.clubs);
+      } catch (err) {
+        console.error("Failed to fetch clubs", err);
+      }
+    };
+    fetchClubs();
+  }, [authToken]);
 
   const getStartOfWeek = (date) => {
     const dayOfWeek = date.getDay() || 7;
@@ -102,8 +113,9 @@ export default function DesktopTimetable() {
       setLoadingAvailability(true);
       const response = await classes.getTrainerAvailability(
         classId,
-        trainerName
-      );
+        trainerName,
+        authToken
+      ); // Pass authToken
       setTrainerAvailability(response.booking_count);
     } catch (error) {
       console.error("Failed to fetch trainer availability", error);
@@ -114,48 +126,90 @@ export default function DesktopTimetable() {
 
   const handleBooking = async () => {
     try {
+      if (!authenticatedUser) {
+        handleBookingSuccess({
+          title: "Authentication Required",
+          message: "Please log in to book classes.",
+        });
+        return;
+      }
       if (!selectedClass || !selectedTrainer) {
-        alert("Please select a trainer to book this class.");
+        handleBookingSuccess({
+          title: "Booking Error",
+          message: "Please select a trainer to book this class.",
+        });
         return;
       }
 
-      const result = await classes.bookClass(
+      const result = await bookings.bookClass(
         selectedClass.class_id,
-        selectedTrainer
+        selectedTrainer,
+        authenticatedUser.user.user_id,
+        authToken
       );
 
-      setModalMessage(result.message || "Class booked successfully!");
-      setIsModalOpen(true);
-
+      handleBookingSuccess({
+        title: "Booking Confirmation",
+        message: result.message || "Class booked successfully!",
+        success: true,
+      });
       handleCloseModal();
     } catch (error) {
-      setModalMessage(
-        error.message === "You have already booked this class."
-          ? "You have already booked this class."
-          : "Failed to book class. Please try again."
-      );
-      setIsModalOpen(true);
+      handleBookingSuccess({
+        title: "Booking Error",
+        message:
+          error.message === "You have already booked this class."
+            ? "You have already booked this class."
+            : "Failed to book class. Please try again.",
+        success: false,
+      });
     }
   };
 
-  const handleUploadSuccess = (message) => {
-    setModalMessage(message || "XML file uploaded successfully!");
-    setIsModalOpen(true);
+  const handleBookingSuccess = ({ title, message, success = false }) => {
+    setModalMessage({ title, message });
+    setBookingSuccess(success);
+    setIsBookingModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleViewBooking = () => {
+    navigate("/bookings");
+    closeBookingModal();
+  };
+
+  const closeBookingModal = () => {
+    setIsBookingModalOpen(false);
     setModalMessage("");
+    setBookingSuccess(false);
+  };
+
+  const handleRedirectToManageActivities = () => {
+    navigate("/manage-activities");
+  };
+
+  const handleRedirectToManageClasses = () => {
+    navigate("/manage-classes");
   };
 
   return (
     <>
       <div className="flex flex-col justify-between">
         <div className="flex flex-col gap-4 items-center p-4 justify-center">
-          <div className="xml-uploader-section mb-6">
-            <h2 className="text-xl font-semibold mb-2">Import Activities</h2>
-            <XMLUploader onUploadSuccess={handleUploadSuccess} />
-          </div>
+          {authenticatedUser &&
+            authenticatedUser.user.user_role === "admin" && (
+              <div className="pt-6 mx-auto">
+                <button
+                  className="btn"
+                  onClick={handleRedirectToManageActivities}
+                >
+                  Manage Activities
+                </button>
+                <button className="btn ml-2" onClick={handleRedirectToManageClasses}>
+                  Manage Classes
+                </button>
+                <hr className="my-4 " />
+              </div>
+            )}
 
           <h3 className="font-semibold">
             {new Date().toLocaleDateString("en-AU", {
@@ -173,20 +227,42 @@ export default function DesktopTimetable() {
           />
 
           <div className="container py-2 mx-auto">
-            <TimetableHeader
-              handleNextWeek={handleNextWeek}
-              handlePrevWeek={handlePrevWeek}
-              checkThisWeekDates={checkThisWeekDates}
-              currentWeekDates={currentWeekDates}
-            />
-            <ClassList
-              isLoading={isLoading}
-              error={error}
-              classData={classData}
-              selectedClub={selectedClub}
-              handleOpenModal={handleOpenModal}
-              currentWeekDates={currentWeekDates}
-            />
+            {!authenticatedUser ? (
+              <div className="text-center py-4">
+                <span>Please </span>
+                <button
+                  className="underline text-info"
+                  onClick={() => navigate("/signin")}
+                >
+                  Sign In
+                </button>
+                <span> or </span>
+                <button
+                  className="underline text-info"
+                  onClick={() => navigate("/signup")}
+                >
+                  Sign Up
+                </button>
+                <span> to see classes.</span>
+              </div>
+            ) : (
+              <>
+                <TimetableHeader
+                  handleNextWeek={handleNextWeek}
+                  handlePrevWeek={handlePrevWeek}
+                  checkThisWeekDates={checkThisWeekDates}
+                  currentWeekDates={currentWeekDates}
+                />
+                <ClassList
+                  isLoading={isLoading}
+                  error={error}
+                  classData={classData}
+                  selectedClub={selectedClub}
+                  handleOpenModal={handleOpenModal}
+                  currentWeekDates={currentWeekDates}
+                />
+              </>
+            )}
           </div>
 
           {selectedClass && (
@@ -203,17 +279,28 @@ export default function DesktopTimetable() {
           )}
         </div>
 
-        <Footer />
-
-        {/* Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-              <h2 className="text-lg font-semibold mb-4">Upload XML</h2>
-              <p className="mb-6">{modalMessage}</p>
-              <button onClick={closeModal} className="button-secondary-style text-sm ">
-                Close
-              </button>
+        {/* Booking Confirmation Modal */}
+        {isBookingModalOpen && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg mb-4">{modalMessage.title}</h3>
+              <p>{modalMessage.message}</p>
+              <div className="modal-action">
+                <button
+                  className="button-secondary-style text-sm"
+                  onClick={closeBookingModal}
+                >
+                  Close
+                </button>
+                {bookingSuccess && (
+                  <button
+                    className="button-main-style text-sm text-base-100"
+                    onClick={handleViewBooking}
+                  >
+                    View My Booking
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

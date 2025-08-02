@@ -1,10 +1,11 @@
-// ClubDropdown.jsx
 export default function ClubDropdown({ clubs, selectedClub, setSelectedClub }) {
   return (
     <select
-      value={selectedClub ? selectedClub.id : ""}
+      value={selectedClub ? selectedClub.club_id : ""}
       onChange={(e) => {
-        const club = clubs.find((club) => club.id === parseInt(e.target.value, 10));
+        const club = clubs.find(
+          (club) => club.club_id === parseInt(e.target.value, 10)
+        );
         setSelectedClub(club);
       }}
       className="select select-bordered w-full max-w-xs"
@@ -13,8 +14,8 @@ export default function ClubDropdown({ clubs, selectedClub, setSelectedClub }) {
         Choose Club
       </option>
       {clubs.map((club) => (
-        <option key={club.id} value={club.id}>
-          {club.name}
+        <option key={club.club_id} value={club.club_id}>
+          {club.club_name}
         </option>
       ))}
     </select>

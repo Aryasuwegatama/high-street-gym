@@ -1,21 +1,16 @@
-
-
-export default function ClassModal({ 
-    selectedClass, 
-    handleCloseModal, 
-    handleBooking,
-    selectedTrainer, 
-    setSelectedTrainer,
-    fetchTrainerAvailability,
-    loadingAvailability,
-    trainerAvailability
-    
+export default function ClassModal({
+  selectedClass,
+  handleCloseModal,
+  handleBooking,
+  selectedTrainer,
+  setSelectedTrainer,
+  fetchTrainerAvailability,
+  loadingAvailability,
+  trainerAvailability,
 }) {
-
-  
-    return (
-     <>
-     {selectedClass && (
+  return (
+    <>
+      {selectedClass && (
         <div className="modal modal-open">
           <div className="modal-box">
             <p className="text-xl font-bold py-2">
@@ -97,7 +92,6 @@ export default function ClassModal({
           </div>
         </div>
       )}
-     </>
-    );
-  }
-  
+    </>
+  );
+}

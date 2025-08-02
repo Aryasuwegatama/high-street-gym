@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE clubs-upload [
+  <!ELEMENT clubs-upload (clubs)>
+  <!ATTLIST clubs-upload operation (insert|update) "insert">
+  <!ELEMENT clubs (club+)>
+  <!ELEMENT club (id?, name, address, phone, email, latitude?, longitude?, facilities?)>
+  <!ELEMENT id (#PCDATA)>
+  <!ELEMENT name (#PCDATA)>
+  <!ELEMENT address (#PCDATA)>
+  <!ELEMENT phone (#PCDATA)>
+  <!ELEMENT email (#PCDATA)>
+  <!ELEMENT latitude (#PCDATA)>
+  <!ELEMENT longitude (#PCDATA)>
+  <!ELEMENT facilities (#PCDATA)>
+]>
+
+<clubs-upload operation="insert">
+  <clubs>
+    <club>
+      <name>South Bank</name>
+      <address>456 Queen Street, Brisbane City QLD 4000</address>
+      <phone>(07) 3366 7788</phone>
+      <email>westend@hsg.com.au</email>
+      <latitude>-27.47102800</latitude>
+      <longitude>153.02533300</longitude>
+      <facilities>
+        Spacious gym floor with a wide range of equipment; Group fitness classes (Yoga, Pilates, HIIT, Boxing, Zumba); Personal training; Boxing and karate studios; 24-hour access; On-site café; On-site parking
+      </facilities>
+    </club>
+  </clubs>
+</clubs-upload>

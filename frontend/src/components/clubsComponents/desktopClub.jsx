@@ -1,12 +1,12 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { clubData } from "../../club-testing";
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { HiOutlinePhone, HiOutlineMail } from "react-icons/hi";
-import Footer from "../common/Footer";
+import { getAllClubs } from "../../api/clubs";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Create a custom icon
 const clubIcon = new L.Icon({
@@ -16,19 +16,37 @@ const clubIcon = new L.Icon({
 });
 
 export default function DesktopClubs() {
+  const navigate = useNavigate();
+  const { authenticatedUser, authToken } = useAuth();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedClub, setSelectedClub] = useState(null);
+  const [clubData, setClubData] = useState([]);
   const mapRef = useRef(null);
 
-  // useEffect(() => {
-  //   // Set mapLoaded to true when the map container is loaded
-  //   if (mapRef.current) {
-  //     const map = mapRef.current.leafletElement;
-  //     map.on("load", () => {
-  //       setMapLoaded(true);
-  //     });
-  //   }
-  // }, []);
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const clubs = await getAllClubs(authToken);
+        setClubData(clubs.clubs);
+        if (clubs.clubs.length > 0) {
+          const lastClub = clubs.clubs[clubs.clubs.length - 1];
+          if (lastClub.club_latitude && lastClub.club_longitude) {
+            mapRef.current.leafletElement.setView(
+              [lastClub.club_latitude, lastClub.club_longitude],
+              14
+            );
+          }
+        }
+        setMapLoaded(true);
+      } catch (error) {
+        console.error("Failed to fetch clubs:", error);
+      }
+    };
+
+    fetchClubs();
+  }, [authToken]);
+
+  console.log(clubData);
 
   const openModal = (club) => {
     setSelectedClub(club);
@@ -41,6 +59,17 @@ export default function DesktopClubs() {
   return (
     <>
       <div className="container mx-auto p-4 ">
+        {authenticatedUser.user.user_role === "admin" && (
+          <div>
+            <button
+              className="btn shadow"
+              onClick={() => navigate("/manage-clubs")}
+            >
+              Manage Clubs
+            </button>
+            <hr className="my-4" />
+          </div>
+        )}
         <h2 className="text-3xl font-bold mb-6 text-center">OUR CLUBS</h2>
 
         {/* Conditionally render content based on mapLoaded */}
@@ -74,37 +103,37 @@ export default function DesktopClubs() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {clubData.map((club) => (
-                  <Marker
-                    key={club.id}
-                    position={[club.latitude, club.longitude]}
-                    icon={clubIcon}
-                  >
-                    <Popup>
-                      {/* Detailed Popup Content */}
-                      <div className="flex flex-col gap-1">
-                        <h3 className="font-bold text-xl">{club.location}</h3>
-                        <p className="">{club.address}</p>
-                        <hr className="border my-4" />
-                        <p className="flex items-center gap-1 font-semibold">
-                          <HiOutlinePhone />
-                          {club.phone}
-                        </p>
-                        <p className="flex items-center gap-1 font-semibold">
-                          <HiOutlineMail />
-                          {club.email}
-                        </p>
-                        {/* <hr className="border my-2 w-1/5" />
-                        <p className="font-semibold">Facilities:</p>
-                        <ul className="pl-4 list-disc">
-                          {club.facilities.map((facility, i) => (
-                            <li key={i}>{facility}</li>
-                          ))}
-                        </ul> */}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
+                {Array.isArray(clubData) &&
+                  clubData.map(
+                    (club) =>
+                      club.club_latitude &&
+                      club.club_longitude && (
+                        <Marker
+                          key={club.club_id}
+                          position={[club.club_latitude, club.club_longitude]}
+                          icon={clubIcon}
+                        >
+                          <Popup>
+                            {/* Detailed Popup Content */}
+                            <div className="flex flex-col gap-1">
+                              <h3 className="font-bold text-xl">
+                                {club.club_name}
+                              </h3>
+                              <p className="">{club.club_address}</p>
+                              <hr className="border my-4" />
+                              <p className="flex items-center gap-1 font-semibold">
+                                <HiOutlinePhone />
+                                {club.club_phone}
+                              </p>
+                              <p className="flex items-center gap-1 font-semibold">
+                                <HiOutlineMail />
+                                {club.club_email}
+                              </p>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )
+                  )}
               </MapContainer>
             </div>
 
@@ -113,13 +142,13 @@ export default function DesktopClubs() {
               <h3 className="text-xl font-semibold mb-2">Club Locations</h3>
               {clubData.map((club) => (
                 <div
-                  key={club.id}
+                  key={club.club_id}
                   className="flex bg-base-200 p-4 rounded-lg"
                   onClick={() => openModal(club)}
                 >
                   <div className="flex flex-wrap px-1">
-                    <h4 className="font-semibold">{club.location}</h4>
-                    <p className="text-sm font-light">{club.address}</p>
+                    <h4 className="font-semibold">{club.club_name}</h4>
+                    <p className="text-sm font-light">{club.club_address}</p>
                   </div>
                   <div className="flex items-center">
                     <BsThreeDotsVertical className="h-6 w-8" />
@@ -141,21 +170,21 @@ export default function DesktopClubs() {
                 ✕
               </button>
               <div className="flex flex-col gap-1">
-                <h3 className="font-bold text-xl">{selectedClub.location}</h3>
-                <p className="">{selectedClub.address}</p>
+                <h3 className="font-bold text-xl">{selectedClub.club_name}</h3>
+                <p className="">{selectedClub.club_address}</p>
                 <hr className="border my-4" />
                 <p className="flex items-center gap-1 font-semibold">
                   <HiOutlinePhone />
-                  {selectedClub.phone}
+                  {selectedClub.club_phone}
                 </p>
                 <p className="flex items-center gap-1 font-semibold">
                   <HiOutlineMail />
-                  {selectedClub.email}
+                  {selectedClub.club_email}
                 </p>
                 <hr className="border my-2 w-1/5" />
                 <p className="font-semibold">Facilities:</p>
                 <ul className="pl-4">
-                  {selectedClub.facilities.map((facility, i) => (
+                  {selectedClub.club_facilities.map((facility, i) => (
                     <li className="list-disc" key={i}>
                       {facility}
                     </li>
@@ -166,7 +195,6 @@ export default function DesktopClubs() {
           </div>
         )}
       </div>
-        <Footer/>
     </>
   );
 }

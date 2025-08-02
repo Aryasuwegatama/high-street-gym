@@ -3,9 +3,9 @@ import logo from "/logo-white.png";
 
 export default function Footer() {
   return (
-    <footer className="footer bg-neutral text-neutral-content p-10 hidden md:flex mt-20">
+    <footer className="footer bg-neutral text-neutral-content p-10 hidden md:flex border-t border-white">
       <aside className="flex-2 w-1/2">
-      <img className="w-12 mx-4 md:w-14 md:mx-4" src={logo} alt="logo hsg" />
+        <img className="w-12 mx-4 md:w-14 md:mx-4" src={logo} alt="logo hsg" />
         <p>
           High Street Gym
           <br />

@@ -1,21 +1,13 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import PageContext from "../../context/PageContext";
-import {
-  TbFileTypeXml,
-  TbHome,
-  TbCalendarSearch,
-  TbBook2,
-} from "react-icons/tb";
-import { FaMapLocationDot } from "react-icons/fa6";
+import { TbHome, TbCalendarSearch, TbBook2 } from "react-icons/tb";
 import { GrMapLocation } from "react-icons/gr";
-import { BiSolidMessageEdit } from "react-icons/bi";
 
 export default function BtmNav({ setCurrentPage }) {
   const { currentPage } = useContext(PageContext);
   return (
-    <nav className="md:hidden btm-nav btm-nav-sm bg-neutral rounded-full flex items-center justify-center py-8 z-50">
-      {/* icon using tabler library */}
+    <nav className="md:hidden btm-nav btm-nav-sm bg-neutral rounded-full flex items-center justify-center py-8 z-50 border border-white">
       <Link
         to={"/home"}
         onClick={() => setCurrentPage("HOME")}
@@ -68,14 +60,6 @@ export default function BtmNav({ setCurrentPage }) {
         />
         clubs
       </Link>
-      {/* <Link
-        to={"/home"}
-        onClick={() => setCurrentPage("home")}
-        className="h-16 text-base-100 text-xs bg-transparent border-none"
-      >
-        <BiSolidMessageEdit className="h-7 text-base-100" size="lg" />
-        blogpost
-      </Link> */}
     </nav>
   );
 }

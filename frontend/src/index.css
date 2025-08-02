@@ -7,17 +7,19 @@
   /* border: 1px red dotted; */
 }
 
-
 /* CUSTOM CLASS COMPONENT */
 @layer components {
   .button-main-style {
-   @apply btn btn-info text-lg hover:bg-primary px-8 focus:outline focus:bg-primary rounded-full;
+    @apply btn btn-info text-lg hover:bg-primary px-8 focus:outline focus:bg-primary rounded-full text-base-100;
   }
   .button-secondary-style {
     @apply btn hover:bg-base-300 px-8 focus:outline focus:bg-base-300 text-lg rounded-full;
   }
   .button-delete-style {
     @apply btn btn-error hover:bg-error px-8 focus:outline focus:bg-error text-sm text-base-100 rounded-full;
+  }
+  .button-edit-style {
+    @apply btn btn-warning hover:bg-warning px-8 focus:outline focus:bg-warning text-sm text-base-100 rounded-full;
   }
 }
 
@@ -37,5 +39,3 @@ select:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
   color: white;
 }
-
-

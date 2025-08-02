@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaRegCalendarXmark } from "react-icons/fa6";
-import * as classes from "../../api/classes"; // Import API functions
+import * as bookings from "../../api/bookings";
+import { useAuth } from "../../context/AuthContext";
+import BookingResultModal from "./BookingResultModal";
 
 export default function ConfirmedBookingCard({
   classItem,
@@ -9,7 +11,11 @@ export default function ConfirmedBookingCard({
   formatTime,
   fetchUserBookings,
 }) {
+  const { authToken, authenticatedUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
+  const [resultType, setResultType] = useState("success");
   const [error, setError] = useState(null);
 
   const handleCloseModal = () => {
@@ -19,17 +25,32 @@ export default function ConfirmedBookingCard({
 
   const handleOpenModal = () => setShowModal(true);
 
+  const handleCloseResultModal = () => {
+    setShowResultModal(false);
+    setResultMessage("");
+    fetchUserBookings();
+  };
+
   const handleCancelBooking = async () => {
     try {
-      const result = await classes.cancelClassBooking(classItem.booking_id);
+      const result = await bookings.cancelClassBooking(
+        classItem.booking_id,
+        authToken
+      );
       if (!result || result.status !== 200) {
         throw new Error("Cancellation failed. Please try again.");
       }
-      fetchUserBookings(); // Refresh bookings
-      handleCloseModal(); // Close the modal
+      setResultMessage("The class booking cancelled successfully.");
+      setResultType("success");
+      setShowResultModal(true);
     } catch (error) {
       console.error("Cancel Booking Error:", error);
-      setError(error.message); // Display error message in the modal
+      setError(error.message);
+      setResultMessage(error.message);
+      setResultType("error");
+      setShowResultModal(true);
+    } finally {
+      handleCloseModal();
     }
   };
 
@@ -55,16 +76,19 @@ export default function ConfirmedBookingCard({
       <p className="text-sm font-bold my-4">
         Booked At:{" "}
         <span className="font-semibold">
-          {formatDate(classItem.class_date)}, {formatTime(classItem.booking_created_date)}
+          {formatDate(classItem.class_date)},{" "}
+          {formatTime(classItem.booking_created_date)}
         </span>
       </p>
       {/* <hr className="border-gray-400 my-4" /> */}
-      <div className="modal-action absolute right-4 md:right-4 top-0">
-        <button className="" onClick={handleOpenModal}>
-          <FaRegCalendarXmark className="w-5 md:w-6 h-5 md:h-6 text-error" />
-        </button>
-      </div>
-
+      {authenticatedUser.user.role !== "member" && (
+        // Hide button for members
+        <div className="modal-action absolute right-4 md:right-4 top-0">
+          <button className="" onClick={handleOpenModal}>
+            <FaRegCalendarXmark className="w-5 md:w-6 h-5 md:h-6 text-error" />
+          </button>
+        </div>
+      )}
       {showModal && (
         <div className="modal modal-open">
           <div className="modal-box">
@@ -74,7 +98,10 @@ export default function ConfirmedBookingCard({
             {error && <p className="text-error mt-4">{error}</p>}
 
             <div className="modal-action">
-              <button className="button-secondary-style text-sm" onClick={handleCloseModal}>
+              <button
+                className="button-secondary-style text-sm"
+                onClick={handleCloseModal}
+              >
                 Close
               </button>
               <button
@@ -86,6 +113,13 @@ export default function ConfirmedBookingCard({
             </div>
           </div>
         </div>
+      )}
+      {showResultModal && (
+        <BookingResultModal
+          type={resultType}
+          message={resultMessage}
+          onClose={handleCloseResultModal}
+        />
       )}
     </div>
   );

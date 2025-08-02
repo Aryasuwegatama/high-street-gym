@@ -1,8 +1,10 @@
 // XMLUploader.jsx
 import React, { useState } from "react";
 import { API_URL } from "../../api/api.js";
+import { useAuth } from "../../context/AuthContext";
 
 export default function XMLUploader({ onUploadSuccess }) {
+  const { authToken } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -33,6 +35,9 @@ export default function XMLUploader({ onUploadSuccess }) {
     try {
       const response = await fetch(`${API_URL}/xml-upload/activities`, {
         method: "POST",
+        headers: {
+          authToken: authToken,
+        },
         body: formData,
       });
 
@@ -56,12 +61,12 @@ export default function XMLUploader({ onUploadSuccess }) {
           type="file"
           accept=".xml"
           onChange={handleFileChange}
-          className="file-input file-input-bordered file-input-primary join-item"
+          className="file-input file-input-bordered file-input-primary w-full flex-1 join-item text-sm"
         />
         <button
           type="submit"
           className="btn btn-primary join-item"
-          disabled={isUploading}
+          disabled={isUploading || !selectedFile}
         >
           {isUploading ? "Uploading..." : "Upload XML"}
         </button>

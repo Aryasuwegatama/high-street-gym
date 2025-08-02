@@ -1,18 +1,13 @@
-// MobileTimetable.jsx
 import React, { useState, useEffect } from "react";
 import * as classes from "../../../api/classes";
+import * as bookings from "../../../api/bookings";
+import * as clubsApi from "../../../api/clubs";
 import ClubDropdown from "./MbDropdown";
 import TimetableHeader from "./MbTimetableHeader";
 import ClassList from "./MbClassList";
 import ClassModal from "./MbClassModal";
-
-const clubs = [
-  { id: 1, name: "Ashgrove", location: "Ashgrove" },
-  { id: 2, name: "Brisbane City", location: "Brisbane" },
-  { id: 3, name: "Chermside", location: "Chermside" },
-  { id: 4, name: "Graceville", location: "Graceville" },
-  { id: 5, name: "Westlake", location: "Westlake" },
-];
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function MobileTimetable() {
   const [activeDate, setActiveDate] = useState(new Date());
@@ -24,6 +19,12 @@ export default function MobileTimetable() {
   const [selectedTrainer, setSelectedTrainer] = useState("");
   const [trainerAvailability, setTrainerAvailability] = useState(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const { authenticatedUser, authToken } = useAuth();
+  const navigate = useNavigate();
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState({ title: "", message: "" });
+  const [clubs, setClubs] = useState([]);
 
   useEffect(() => {
     const fetchClassData = async () => {
@@ -31,7 +32,12 @@ export default function MobileTimetable() {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await classes.getClassesByClub(selectedClub.name);
+        // console.log(selectedClub.club_name);
+        const data = await classes.getClassesByClub(
+          selectedClub.club_name,
+          authToken
+        );
+        // console.log(data);
         setClassData(data);
       } catch (err) {
         setError(err.message);
@@ -40,7 +46,20 @@ export default function MobileTimetable() {
       }
     };
     fetchClassData();
-  }, [selectedClub]);
+  }, [selectedClub, authToken]);
+
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const data = await clubsApi.getAllClubs(authToken);
+        console.log(data);
+        setClubs(data.clubs);
+      } catch (err) {
+        console.error("Failed to fetch clubs", err);
+      }
+    };
+    fetchClubs();
+  }, [authToken]);
 
   const handlePrevDate = () => {
     const newDate = new Date(activeDate);
@@ -67,17 +86,23 @@ export default function MobileTimetable() {
   });
 
   const filterClasses = (timeFilter) => {
-    return classData.filter((classItem) => {
-      const classTimeHour =
-        classItem.class_time && typeof classItem.class_time === "string"
-          ? parseInt(classItem.class_time.split(":")[0], 10)
-          : null;
-      return (
-        classItem.class_date === formattedActiveDate &&
-        timeFilter(classTimeHour) &&
-        classItem.club_name === selectedClub.name
-      );
-    });
+    return classData
+      .filter((classItem) => {
+        const classTimeHour =
+          classItem.class_time && typeof classItem.class_time === "string"
+            ? parseInt(classItem.class_time.split(":")[0], 10)
+            : null;
+        return (
+          classItem.class_date === formattedActiveDate &&
+          timeFilter(classTimeHour) &&
+          classItem.club_name === selectedClub.club_name
+        );
+      })
+      .sort((a, b) => {
+        const timeA = a.class_time.split(":").map(Number);
+        const timeB = b.class_time.split(":").map(Number);
+        return timeA[0] - timeB[0] || timeA[1] - timeB[1];
+      });
   };
 
   const morningClasses = filterClasses((hour) => hour < 12);
@@ -92,15 +117,15 @@ export default function MobileTimetable() {
 
   const handleCloseModal = () => setSelectedClass(null);
 
-  
   // get trainer avaialability
   const fetchTrainerAvailability = async (classId, trainerName) => {
     try {
       setLoadingAvailability(true);
       const response = await classes.getTrainerAvailability(
         classId,
-        trainerName
-      );
+        trainerName,
+        authToken
+      ); // Pass authToken
       setTrainerAvailability(response.booking_count);
     } catch (error) {
       console.error("Failed to fetch trainer availability", error);
@@ -109,46 +134,74 @@ export default function MobileTimetable() {
     }
   };
 
-  // Function to handle booking a class with the selected trainer
+  const handleBookingSuccess = ({ title, message, success = false }) => {
+    setModalMessage({ title, message });
+    setBookingSuccess(success);
+    setIsBookingModalOpen(true);
+  };
+
+  const closeBookingModal = () => {
+    setIsBookingModalOpen(false);
+    setModalMessage({ title: "", message: "" });
+    setBookingSuccess(false);
+  };
+
+  const handleViewBooking = () => {
+    navigate("/bookings");
+    closeBookingModal();
+  };
+
   const handleBooking = async () => {
     try {
+      if (!authenticatedUser) {
+        handleBookingSuccess({
+          title: "Authentication Required",
+          message: "Please log in to book classes.",
+        });
+        return;
+      }
       if (!selectedClass || !selectedTrainer) {
-        alert("Please select a trainer to book this class.");
+        handleBookingSuccess({
+          title: "Booking Error",
+          message: "Please select a trainer to book this class.",
+        });
         return;
       }
 
-      const result = await classes.bookClass(
+      const result = await bookings.bookClass(
         selectedClass.class_id,
-        selectedTrainer
+        selectedTrainer,
+        authenticatedUser.user.user_id,
+        authToken
       );
 
-      if (!result.success) {
-        if (result.message === "You have already booked this class.") {
-          alert("You have already booked this class.");
-        } else if (
-          result.message ===
-          "This class with the selected trainer is fully booked."
-        ) {
-          alert("This class is fully booked. Please choose another class.");
-        } else {
-          alert(result.message);
-        }
-      } else {
-        alert("Class booked successfully!");
-        handleCloseModal();
-      }
+      handleBookingSuccess({
+        title: "Booking Confirmation",
+        message: result.message || "Class booked successfully!",
+        success: true,
+      });
+      handleCloseModal();
     } catch (error) {
-      console.error("Error booking class:", error);
-      alert("An unexpected error occurred. Please try again.");
+      handleBookingSuccess({
+        title: "Booking Error",
+        message:
+          error.message === "You have already booked this class."
+            ? "You have already booked this class."
+            : "Failed to book class. Please try again.",
+        success: false,
+      });
     }
   };
 
-  // console.log(selectedTrainer)
-  // console.log(selectedClass.class_id)
+  const handleRedirectToManageClasses = () => {
+    navigate("/manage-classes");
+  };
+  const handleRedirectToManageActivities = () => {
+    navigate("/manage-activities");
+  };
 
   return (
     <>
-      <ClubDropdown clubs={clubs} selectedClub={selectedClub} setSelectedClub={setSelectedClub} />
       <h3 className="font-semibold p-2">
         {new Date().toLocaleDateString("en-AU", {
           weekday: "long",
@@ -160,22 +213,61 @@ export default function MobileTimetable() {
           year: "numeric",
         })}
       </h3>
+      <ClubDropdown
+        clubs={clubs}
+        selectedClub={selectedClub}
+        setSelectedClub={setSelectedClub}
+      />
 
       <div className="container mx-auto p-2 pb-20">
-      <TimetableHeader
-        activeDate={activeDate}
-        handlePrevDate={handlePrevDate}
-        handleNextDate={handleNextDate}
-      />
-      <ClassList
-        isLoading={isLoading}
-        error={error}
-        selectedClub={selectedClub}
-        handleOpenModal={handleOpenModal}
-        morningClasses={morningClasses}
-        afternoonClasses={afternoonClasses}
-        eveningClasses={eveningClasses}
-      />
+        {!authenticatedUser ? (
+          <div className="text-center py-4">
+            <span>Please </span>
+            <button
+              className="underline text-info"
+              onClick={() => navigate("/signin")}
+            >
+              Sign In
+            </button>
+            <span> or </span>
+            <button
+              className="underline text-info"
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
+            </button>
+            <span> to see classes.</span>
+          </div>
+        ) : (
+          <>
+            {authenticatedUser && authenticatedUser.user.user_role === "admin" && (
+              <div className="pt-6 mx-auto">
+                <button className="btn" onClick={handleRedirectToManageActivities}>
+                  Manage Activities
+                </button>
+                <button className="btn ml-2" onClick={handleRedirectToManageClasses}>
+                  Manage Classes
+                </button>
+                <hr className="my-4 " />
+              </div>
+            )}
+            <TimetableHeader
+              activeDate={activeDate}
+              handlePrevDate={handlePrevDate}
+              handleNextDate={handleNextDate}
+            />
+            <ClassList
+              isLoading={isLoading}
+              error={error}
+              selectedClub={selectedClub}
+              handleOpenModal={handleOpenModal}
+              morningClasses={morningClasses}
+              afternoonClasses={afternoonClasses}
+              eveningClasses={eveningClasses}
+              authenticatedUser={authenticatedUser}
+            />
+          </>
+        )}
       </div>
       {selectedClass && (
         <ClassModal
@@ -188,6 +280,30 @@ export default function MobileTimetable() {
           fetchTrainerAvailability={fetchTrainerAvailability}
           handleBooking={handleBooking}
         />
+      )}
+      {isBookingModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">{modalMessage.title}</h3>
+            <p>{modalMessage.message}</p>
+            <div className="modal-action">
+              <button
+                className="button-secondary-style text-sm"
+                onClick={closeBookingModal}
+              >
+                Close
+              </button>
+              {bookingSuccess && (
+                <button
+                  className="button-main-style text-sm text-base-100"
+                  onClick={handleViewBooking}
+                >
+                  View My Booking
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

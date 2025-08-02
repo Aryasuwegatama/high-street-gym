@@ -1,4 +1,3 @@
-// components/ClassDetailsModal.jsx
 import React from "react";
 
 export default function BookingDetailsModal({
@@ -58,7 +57,7 @@ export default function BookingDetailsModal({
           </button>
           <button
             className={`button-main-style text-sm bg-error hover:bg-warning text-base-100`}
-            onClick={handleAction} // Call appropriate action handler
+            onClick={handleAction}
           >
             {selectedClass.booking_status === "confirmed"
               ? "Cancel Booking"

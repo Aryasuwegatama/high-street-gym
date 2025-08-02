@@ -1,4 +1,3 @@
-// ClassList.jsx
 import ClassCard from "./MbCLassCard";
 
 export default function ClassList({
@@ -9,6 +8,7 @@ export default function ClassList({
   morningClasses,
   afternoonClasses,
   eveningClasses,
+  authenticatedUser,
 }) {
   return (
     <>
@@ -17,7 +17,7 @@ export default function ClassList({
           <span className="loading loading-spinner loading-lg text-info"></span>
         </div>
       ) : error ? (
-        <div role="alert" className="alert alert-error">
+        <div role="alert" className="alert alert-warning">
           <span>{error}</span>
         </div>
       ) : selectedClub ? (
@@ -32,8 +32,10 @@ export default function ClassList({
             ) : (
               morningClasses.map((classItem) => (
                 <ClassCard
+                  key={classItem.class_id}
                   classItem={classItem}
                   handleOpenModal={handleOpenModal}
+                  authenticatedUser={authenticatedUser}
                 />
               ))
             )}
@@ -49,8 +51,10 @@ export default function ClassList({
             ) : (
               afternoonClasses.map((classItem) => (
                 <ClassCard
+                  key={classItem.class_id}
                   classItem={classItem}
                   handleOpenModal={handleOpenModal}
+                  authenticatedUser={authenticatedUser}
                 />
               ))
             )}
@@ -65,8 +69,10 @@ export default function ClassList({
             ) : (
               eveningClasses.map((classItem) => (
                 <ClassCard
+                  key={classItem.class_id}
                   classItem={classItem}
                   handleOpenModal={handleOpenModal}
+                  authenticatedUser={authenticatedUser}
                 />
               ))
             )}
