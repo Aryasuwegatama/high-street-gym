@@ -247,10 +247,6 @@ npm install
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open Pull Request
 
-## 📝 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
 ## 👨‍💻 Author
 
 **Arya Suwegatama**
@@ -265,9 +261,3 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - MySQL for reliable data storage
 
 ---
-
-<div align="center">
-
-**🏋️‍♂️ Built with ❤️ for High Street Gym 🏋️‍♀️**
-
-</div>
